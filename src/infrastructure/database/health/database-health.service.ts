@@ -4,11 +4,31 @@ import {
   ServiceUnavailableException,
 } from '@nestjs/common';
 import { InjectConnection } from '@nestjs/mongoose';
+import { Exclude, Expose } from 'class-transformer';
 import mongoose, { type Connection } from 'mongoose';
 
-export interface DatabaseHealthStatus {
-  status: 'ok';
-  database: 'connected';
+@Exclude()
+export class DatabaseHealthStatusDto {
+  @Expose()
+  status!: 'ok';
+
+  @Expose()
+  database!: 'connected';
+
+  constructor() {
+    this.status = 'ok';
+    this.database = 'connected';
+  }
+}
+
+@Exclude()
+export class LivenessStatusDto {
+  @Expose()
+  status!: 'ok';
+
+  constructor() {
+    this.status = 'ok';
+  }
 }
 
 @Injectable()
@@ -17,7 +37,7 @@ export class DatabaseHealthService {
 
   constructor(@InjectConnection() private readonly connection: Connection) {}
 
-  async check(): Promise<DatabaseHealthStatus> {
+  async check(): Promise<DatabaseHealthStatusDto> {
     if (
       this.connection.readyState !== mongoose.STATES.connected ||
       !this.connection.db
@@ -31,7 +51,7 @@ export class DatabaseHealthService {
 
     try {
       await this.connection.db.admin().ping();
-      return { status: 'ok', database: 'connected' };
+      return new DatabaseHealthStatusDto();
     } catch {
       this.logger.warn('Readiness check failed: database ping failed');
       throw new ServiceUnavailableException({

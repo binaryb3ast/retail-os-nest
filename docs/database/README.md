@@ -4,7 +4,7 @@
 
 `DatabaseModule` owns the application's single shared Mongoose connection, connection lifecycle logging, the database readiness endpoint, and a small transaction helper. It is imported once by `AppModule`. Feature modules should inject models registered with `MongooseModule.forFeature()` and must not call `forRoot()` or create their own connections.
 
-The current project is a NestJS 11 starter with no preexisting database, configuration, or logging subsystem. Nest's `Logger` is used for operational events. Nest Config validates environment variables at startup. Mongoose's connection pool owns sockets and bounds concurrent connections.
+The project uses NestJS 11 and a shared core configuration/logging layer. Database lifecycle events use Nest's `Logger`, which bootstrap routes through the Pino logger so database and request logs share the structured format. Nest Config validates environment variables at startup. Mongoose's connection pool owns sockets and bounds concurrent connections. See the [core infrastructure guide](../core-infrastructure.md) for logging, request context, errors, validation, and API versioning.
 
 ## Environment variables
 

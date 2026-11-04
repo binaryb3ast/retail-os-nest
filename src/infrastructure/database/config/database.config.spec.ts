@@ -33,6 +33,16 @@ describe('database configuration', () => {
     expect(() =>
       validateDatabaseEnvironment({ MONGODB_URI: 'not-a-mongodb-uri' }),
     ).toThrow(/Invalid environment configuration/);
+    for (const uri of [
+      'mongodb://%',
+      'mongodb://localhost:70000/store',
+      'mongodb+srv://host1,host2/store',
+      'mongodb+srv://cluster.example.test:27017/store',
+    ]) {
+      expect(() => validateDatabaseEnvironment({ MONGODB_URI: uri })).toThrow(
+        /Invalid environment configuration/,
+      );
+    }
     expect(() =>
       validateDatabaseEnvironment({
         MONGODB_URI: 'mongodb://localhost',

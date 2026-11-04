@@ -25,6 +25,12 @@
 
 [Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
 
+## Infrastructure guides
+
+- [Core application infrastructure](docs/core-infrastructure.md)
+- [MongoDB infrastructure](docs/database/README.md)
+- Copy `.env.example` to `.env` for local configuration. The application requires a MongoDB replica set when using transactions.
+
 ## Project setup
 
 ```bash

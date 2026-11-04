@@ -1,13 +1,16 @@
-import { Controller, Get } from '@nestjs/common';
-import { DatabaseHealthService } from './database-health.service';
+import { Controller, Get, VERSION_NEUTRAL } from '@nestjs/common';
+import {
+  DatabaseHealthService,
+  LivenessStatusDto,
+} from './database-health.service';
 
-@Controller('health')
+@Controller({ path: 'health', version: VERSION_NEUTRAL })
 export class DatabaseHealthController {
   constructor(private readonly healthService: DatabaseHealthService) {}
 
   @Get('live')
-  live(): { status: 'ok' } {
-    return { status: 'ok' };
+  live(): LivenessStatusDto {
+    return new LivenessStatusDto();
   }
 
   @Get('database')

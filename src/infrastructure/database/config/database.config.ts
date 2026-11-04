@@ -39,6 +39,34 @@ function readInteger(
   return value;
 }
 
+function isMongoUri(uri: string): boolean {
+  const match = uri.match(/^(mongodb(?:\+srv)?:)\/\/([^/?#]+)/i);
+  if (!match || /%(?![0-9a-f]{2})/i.test(uri)) return false;
+
+  const scheme = match[1];
+  const authority = match[2];
+  const hostList = authority.slice(authority.lastIndexOf('@') + 1);
+  const hosts = hostList.split(',');
+  if (
+    hosts.length === 0 ||
+    hosts.some((host) => host.length === 0 || /\s|%/.test(host)) ||
+    (scheme.toLowerCase() === 'mongodb+srv:' && hosts.length !== 1)
+  ) {
+    return false;
+  }
+
+  try {
+    for (const host of hosts) {
+      const parsed = new URL(`mongodb://${host}/`);
+      if (!parsed.hostname) return false;
+      if (scheme.toLowerCase() === 'mongodb+srv:' && parsed.port) return false;
+    }
+  } catch {
+    return false;
+  }
+  return true;
+}
+
 export function validateDatabaseEnvironment(
   environment: DatabaseEnvironment,
 ): DatabaseEnvironment {
@@ -52,8 +80,7 @@ export function validateDatabaseEnvironment(
   }
 
   const uri = readString(environment, 'MONGODB_URI');
-  const uriAuthority = uri.match(/^mongodb(?:\+srv)?:\/\/([^/?#]+)/i)?.[1];
-  if (!uriAuthority || /\s/.test(uriAuthority)) {
+  if (!isMongoUri(uri)) {
     throw new Error(
       'Invalid environment configuration: MONGODB_URI must be a MongoDB URI',
     );
