@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Invoxia - Enterprise Login</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css" rel="stylesheet" type="text/css" />
+  <style>
+      body {
+          font-family: 'Vazirmatn', sans-serif;
+          background-color: #fafafa;
+          color: #111111;
+      }
+      .grid-bg-light {
+          background-image:
+                  linear-gradient(to right, rgba(0, 0, 0, 0.03) 1px, transparent 1px),
+                  linear-gradient(to bottom, rgba(0, 0, 0, 0.03) 1px, transparent 1px);
+          background-size: 40px 40px;
+      }
+
+      /* Custom Micro-animations */
+      @keyframes fadeInUp {
+          from {
+              opacity: 0;
+              transform: translateY(16px);
+          }
+          to {
+              opacity: 1;
+              transform: translateY(0);
+          }
+      }
+
+      @keyframes floatSlow {
+          0%, 100% { transform: translateY(0px); }
+          50% { transform: translateY(-6px); }
+      }
+
+      .animate-fade-in-up {
+          animation: fadeInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      }
+
+      .animate-fade-in-delayed {
+          animation: fadeInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.15s forwards;
+          opacity: 0;
+      }
+
+      .animate-float {
+          animation: floatSlow 4s ease-in-out infinite;
+      }
+
+      /* Focus Glow for Inputs */
+      .input-glow:focus-within {
+          box-shadow: 0 0 0 4px rgba(17, 17, 17, 0.08);
+      }
+  </style>
+</head>
+<body class="grid-bg-light min-h-screen flex items-center justify-center relative py-8 px-4 overflow-x-hidden">
+
+<!-- Language Switcher Header -->
+<header class="absolute top-6 left-6 right-6 flex justify-between items-center z-20 max-w-7xl mx-auto animate-fade-in-up">
+  <div class="flex items-center space-x-3 space-x-reverse group cursor-pointer">
+    <div class="w-9 h-9 bg-[#111111] text-white flex items-center justify-center font-black rounded-full text-base shadow-sm group-hover:scale-105 transition-transform duration-300">
+      IX
+    </div>
+    <span class="text-xl font-black tracking-widest text-[#111111] uppercase group-hover:text-gray-700 transition-colors">INVOXIA</span>
+  </div>
+  <button type="button" class="text-xs font-bold bg-white/80 backdrop-blur border border-gray-200 px-3.5 py-2 rounded-full shadow-sm hover:bg-black hover:text-white hover:border-black active:scale-95 transition-all duration-300 flex items-center gap-1.5 cursor-pointer">
+    <span class="text-sm">🌐</span> FA / EN
+  </button>
+</header>
+
+<!-- Main Container -->
+<main class="w-full max-w-7xl mx-auto flex flex-col lg:flex-row items-center justify-between px-4 lg:px-12 py-12 relative z-10 gap-12 mt-6">
+
+  <!-- Right Side: Dual-Mode & OTP Form Panel -->
+  <section class="w-full lg:w-5/12 flex justify-center lg:justify-start order-1 animate-fade-in-up">
+    <div class="w-full max-w-md bg-white border border-[#e5e5e5] shadow-2xl p-8 lg:p-10 rounded-3xl relative transition-all duration-500 hover:shadow-gray-200/80">
+
+      <!-- Form Header -->
+      <header class="mb-6 text-right">
+        <h1 id="formTitle" class="text-2xl font-bold text-[#111111] mb-2 tracking-tight">ورود به سامانه پایش</h1>
+        <p id="formSubTitle" class="text-xs text-[#707072]">روش ورود مورد نظر خود را انتخاب کنید.</p>
+      </header>
+
+      <!-- Login Mode Tabs Switcher (Hidden in OTP step) -->
+      <div id="tabsContainer" class="bg-[#f3f3f3] p-1 rounded-2xl flex items-center mb-6 border border-gray-200/60">
+        <button
+          id="tabUser"
+          type="button"
+          onclick="switchTab('user')"
+          class="w-1/2 py-2.5 text-xs font-bold rounded-xl transition-all duration-300 bg-white text-[#111111] shadow-sm cursor-pointer"
+        >
+          نام کاربری / ایمیل
+        </button>
+        <button
+          id="tabPhone"
+          type="button"
+          onclick="switchTab('phone')"
+          class="w-1/2 py-2.5 text-xs font-bold rounded-xl transition-all duration-300 text-gray-500 hover:text-black cursor-pointer"
+        >
+          شماره موبایل (OTP)
+        </button>
+      </div>
+
+      <!-- Form Elements -->
+      <form id="loginForm" class="space-y-4" action="#" method="POST">
+
+        <!-- Mode 1: Username / Email Input -->
+        <div id="usernameField" class="space-y-1.5">
+          <label for="username" class="block text-xs font-bold text-[#39393b] text-right">نام کاربری یا ایمیل</label>
+          <div class="relative input-glow rounded-2xl transition-all duration-200">
+            <input
+              id="username"
+              name="username"
+              type="text"
+              autocomplete="username"
+              placeholder="example@invoxia.com"
+              class="w-full bg-[#f8f8f8] text-[#111111] placeholder-[#9e9e9e] text-sm px-5 py-3.5 rounded-2xl focus:outline-none focus:bg-white transition-all duration-300 text-right font-medium border border-gray-200 focus:border-[#111111]"
+              required
+            />
+          </div>
+        </div>
+
+        <!-- Mode 2: Phone Number Input -->
+        <div id="phoneField" class="space-y-1.5 hidden">
+          <label for="phone" class="block text-xs font-bold text-[#39393b] text-right">شماره همراه</label>
+          <div class="relative input-glow rounded-2xl transition-all duration-200 dir-ltr">
+            <input
+              id="phone"
+              name="phone"
+              type="tel"
+              inputmode="numeric"
+              autocomplete="tel"
+              placeholder="09123456789"
+              class="w-full bg-[#f8f8f8] text-[#111111] placeholder-[#9e9e9e] text-sm px-5 py-3.5 rounded-2xl focus:outline-none focus:bg-white transition-all duration-300 text-left font-mono font-medium border border-gray-200 focus:border-[#111111]"
+            />
+          </div>
+        </div>
+
+        <!-- Password Input (Username Mode) -->
+        <div id="passwordField" class="space-y-1.5">
+          <div class="flex justify-between items-center">
+            <label for="password" class="block text-xs font-bold text-[#39393b] text-right">رمز عبور</label>
+            <a href="#" class="text-[11px] font-bold text-gray-500 hover:text-black transition-colors">فراموشی رمز؟</a>
+          </div>
+          <div class="relative flex items-center input-glow rounded-2xl transition-all duration-200">
+            <input
+              id="password"
+              name="password"
+              type="password"
+              autocomplete="current-password"
+              placeholder="••••••••••••"
+              class="w-full bg-[#f8f8f8] text-[#111111] placeholder-[#9e9e9e] text-sm pl-12 pr-5 py-3.5 rounded-2xl focus:outline-none focus:bg-white transition-all duration-300 text-right font-medium border border-gray-200 focus:border-[#111111]"
+              required
+            />
+            <button
+              type="button"
+              onclick="
+                const p = document.getElementById('password');
+                const isPw = p.type === 'password';
+                p.type = isPw ? 'text' : 'password';
+                this.classList.toggle('rotate-12');
+              "
+              class="absolute left-4 text-gray-400 hover:text-black focus:outline-none transition-transform duration-200 active:scale-90"
+              title="نمایش/مخفی‌سازی رمز عبور"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" class="w-5 h-5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z" />
+                <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- Mode 3: OTP 4-Digit Verification Container (Hidden by default) -->
+        <div id="otpSection" class="space-y-4 hidden animate-fade-in-up">
+          <!-- Sent Phone Display & Edit Button -->
+          <div class="flex items-center justify-between bg-[#f8f8f8] p-3 px-4 rounded-2xl border border-gray-200/80">
+            <span id="displayPhoneNumber" class="font-mono text-sm font-bold text-gray-800"></span>
+            <button type="button" onclick="resetToPhoneInput()" class="text-xs font-bold text-[#d30005] hover:underline cursor-pointer">
+              ویرایش شماره
+            </button>
+          </div>
+
+          <!-- 4 Digit Inputs (LTR Grid) -->
+          <div class="grid grid-cols-4 gap-3 dir-ltr my-2" id="otpInputs">
+            <input type="text" maxlength="1" inputmode="numeric" class="otp-input w-full h-14 text-center text-xl font-bold bg-[#f8f8f8] border border-gray-200 rounded-2xl focus:outline-none focus:border-black focus:bg-white transition-all shadow-sm" />
+            <input type="text" maxlength="1" inputmode="numeric" class="otp-input w-full h-14 text-center text-xl font-bold bg-[#f8f8f8] border border-gray-200 rounded-2xl focus:outline-none focus:border-black focus:bg-white transition-all shadow-sm" />
+            <input type="text" maxlength="1" inputmode="numeric" class="otp-input w-full h-14 text-center text-xl font-bold bg-[#f8f8f8] border border-gray-200 rounded-2xl focus:outline-none focus:border-black focus:bg-white transition-all shadow-sm" />
+            <input type="text" maxlength="1" inputmode="numeric" class="otp-input w-full h-14 text-center text-xl font-bold bg-[#f8f8f8] border border-gray-200 rounded-2xl focus:outline-none focus:border-black focus:bg-white transition-all shadow-sm" />
+          </div>
+
+          <!-- Timer & Resend Button -->
+          <div class="flex justify-between items-center text-xs text-gray-500 pt-1">
+            <span id="timerText">ارسال مجدد کد تا <strong id="countdown" class="text-black font-mono">60</strong> ثانیه دیگر</span>
+            <button id="resendBtn" type="button" onclick="resendOTP()" class="hidden font-bold text-black hover:underline cursor-pointer">
+              ارسال مجدد کد
+            </button>
+          </div>
+        </div>
+
+        <!-- Primary Submit Button -->
+        <button
+          id="submitBtn"
+          type="submit"
+          class="group w-full bg-[#111111] text-white font-bold text-sm py-4 rounded-2xl
+                 hover:bg-[#2c2c2e] hover:shadow-xl
+                 active:scale-[0.98]
+                 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#111111]
+                 disabled:opacity-70 disabled:cursor-not-allowed disabled:pointer-events-none
+                 transition-all duration-300 shadow-lg shadow-black/10 mt-2 flex items-center justify-center gap-2 cursor-pointer relative overflow-hidden"
+        >
+          <!-- Loading Spinner -->
+          <svg id="btnSpinner" class="hidden animate-spin w-5 h-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+          </svg>
+
+          <!-- Button Text -->
+          <span id="btnText">ورود به داشبورد</span>
+
+          <!-- Arrow Icon -->
+          <svg id="btnArrow" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.2" stroke="currentColor" class="w-4 h-4 rotate-180 transition-transform duration-300 group-hover:-translate-x-1">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
+          </svg>
+        </button>
+
+      </form>
+
+    </div>
+  </section>
+
+  <!-- Left Side: Editorial Branding & Live Preview Mockup -->
+  <section class="w-full lg:w-6/12 flex flex-col justify-between text-right order-2 animate-fade-in-delayed">
+
+    <!-- Main Campaign Typography -->
+    <div class="my-auto">
+      <span class="inline-block px-4 py-1.5 bg-[#f0f0f0] text-[#111111] text-xs font-bold rounded-full mb-6 uppercase tracking-wider border border-[#e5e5e5] transition-colors hover:bg-gray-200 cursor-default">
+        Next-Gen Asset Tracking
+      </span>
+      <h2 class="text-4xl lg:text-6xl font-black text-[#111111] leading-none mb-6 tracking-tight uppercase select-none">
+        CONTROL <br/>
+        <span class="text-[#d30005] hover:opacity-80 transition-opacity cursor-default">EVERY</span> MOVE.
+      </h2>
+      <p class="text-[#707072] text-sm lg:text-base max-w-md leading-relaxed mb-8">
+        ورود به سامانه مدیریت هوشمند و پایش لحظه‌ای دارایی‌های اینوکسیا. امنیت، دقت و سرعت در یک نگاه.
+      </p>
+
+      <!-- UI Trust Card with Live Pulse Animation -->
+      <div class="bg-white/80 backdrop-blur border border-gray-200 p-4 rounded-2xl shadow-sm max-w-md flex items-center justify-between animate-float hover:shadow-md transition-shadow">
+        <div class="flex items-center space-x-3 space-x-reverse">
+          <div class="relative flex h-3 w-3">
+            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#007d48] opacity-75"></span>
+            <span class="relative inline-flex rounded-full h-3 w-3 bg-[#007d48]"></span>
+          </div>
+          <div class="text-xs">
+            <p class="font-bold text-gray-800">پایش فعال: ۱,۲۴۰ دستگاه</p>
+            <p class="text-gray-500">آخرین همگام‌سازی: هم‌اکنون</p>
+          </div>
+        </div>
+        <span class="text-xs font-bold bg-emerald-50 text-emerald-700 px-2.5 py-1 rounded-lg border border-emerald-200/60">فعال</span>
+      </div>
+    </div>
+
+    <!-- Footer Status -->
+    <div class="flex items-center space-x-6 space-x-reverse text-xs text-[#707072] mt-8">
+      <span class="hover:text-black transition-colors">نسخه ۴.۲.۰</span>
+      <span>•</span>
+      <span class="hover:text-black transition-colors">پشتیبانی ۲۴/۷ سازمانی</span>
+    </div>
+  </section>
+
+</main>
+
+<!-- JavaScript Logic for Tabs, OTP Inputs, and Timer -->
+<script>
+  let currentMode = 'user'; // 'user', 'phone', or 'otp'
+  let timerInterval = null;
+
+  const tabUser = document.getElementById('tabUser');
+  const tabPhone = document.getElementById('tabPhone');
+  const tabsContainer = document.getElementById('tabsContainer');
+
+  const formTitle = document.getElementById('formTitle');
+  const formSubTitle = document.getElementById('formSubTitle');
+
+  const usernameField = document.getElementById('usernameField');
+  const phoneField = document.getElementById('phoneField');
+  const passwordField = document.getElementById('passwordField');
+  const otpSection = document.getElementById('otpSection');
+
+  const usernameInput = document.getElementById('username');
+  const phoneInput = document.getElementById('phone');
+  const passwordInput = document.getElementById('password');
+  const otpInputs = document.querySelectorAll('.otp-input');
+
+  const form = document.getElementById('loginForm');
+  const btn = document.getElementById('submitBtn');
+  const btnText = document.getElementById('btnText');
+  const btnArrow = document.getElementById('btnArrow');
+  const btnSpinner = document.getElementById('btnSpinner');
+
+  // Switch Login Mode
+  function switchTab(mode) {
+    currentMode = mode;
+
+    if (mode === 'user') {
+      tabUser.className = "w-1/2 py-2.5 text-xs font-bold rounded-xl transition-all duration-300 bg-white text-[#111111] shadow-sm cursor-pointer";
+      tabPhone.className = "w-1/2 py-2.5 text-xs font-bold rounded-xl transition-all duration-300 text-gray-500 hover:text-black cursor-pointer";
+
+      usernameField.classList.remove('hidden');
+      passwordField.classList.remove('hidden');
+      phoneField.classList.add('hidden');
+      otpSection.classList.add('hidden');
+
+      usernameInput.required = true;
+      passwordInput.required = true;
+      phoneInput.required = false;
+
+      btnText.textContent = 'ورود به داشبورد';
+    } else if (mode === 'phone') {
+      tabPhone.className = "w-1/2 py-2.5 text-xs font-bold rounded-xl transition-all duration-300 bg-white text-[#111111] shadow-sm cursor-pointer";
+      tabUser.className = "w-1/2 py-2.5 text-xs font-bold rounded-xl transition-all duration-300 text-gray-500 hover:text-black cursor-pointer";
+
+      phoneField.classList.remove('hidden');
+      usernameField.classList.add('hidden');
+      passwordField.classList.add('hidden');
+      otpSection.classList.add('hidden');
+
+      phoneInput.required = true;
+      usernameInput.required = false;
+      passwordInput.required = false;
+
+      btnText.textContent = 'دریافت کد تایید (OTP)';
+    }
+  }
+
+  // OTP State Flow
+  function showOtpSection() {
+    currentMode = 'otp';
+    tabsContainer.classList.add('hidden');
+    phoneField.classList.add('hidden');
+    otpSection.classList.remove('hidden');
+
+    formTitle.textContent = 'تایید کد یک‌بارمصرف';
+    formSubTitle.textContent = 'کد ارسال شده به شماره زیر را وارد کنید.';
+    document.getElementById('displayPhoneNumber').textContent = phoneInput.value || '09123456789';
+
+    btnText.textContent = 'تایید و ورود';
+    startCountdown();
+
+    // Auto focus first OTP input
+    setTimeout(() => otpInputs[0].focus(), 100);
+  }
+
+  function resetToPhoneInput() {
+    clearInterval(timerInterval);
+    tabsContainer.classList.remove('hidden');
+    formTitle.textContent = 'ورود به سامانه پایش';
+    formSubTitle.textContent = 'روش ورود مورد نظر خود را انتخاب کنید.';
+    switchTab('phone');
+  }
+
+  // OTP 4-Digit Inputs Navigation Logic
+  otpInputs.forEach((input, index) => {
+    input.addEventListener('input', (e) => {
+      if (e.target.value.length === 1 && index < otpInputs.length - 1) {
+        otpInputs[index + 1].focus();
+      }
+    });
+
+    input.addEventListener('keydown', (e) => {
+      if (e.key === 'Backspace' && !e.target.value && index > 0) {
+        otpInputs[index - 1].focus();
+      }
+    });
+
+    // Paste Support
+    input.addEventListener('paste', (e) => {
+      e.preventDefault();
+      const pasteData = e.clipboardData.getData('text').trim();
+      if (/^\d{4}$/.test(pasteData)) {
+        pasteData.split('').forEach((char, i) => {
+          if (otpInputs[i]) otpInputs[i].value = char;
+        });
+        otpInputs[3].focus();
+      }
+    });
+  });
+
+  // Countdown Timer
+  function startCountdown() {
+    let seconds = 60;
+    const countdownEl = document.getElementById('countdown');
+    const timerText = document.getElementById('timerText');
+    const resendBtn = document.getElementById('resendBtn');
+
+    timerText.classList.remove('hidden');
+    resendBtn.classList.add('hidden');
+    countdownEl.textContent = seconds;
+
+    clearInterval(timerInterval);
+    timerInterval = setInterval(() => {
+      seconds--;
+      countdownEl.textContent = seconds;
+      if (seconds <= 0) {
+        clearInterval(timerInterval);
+        timerText.classList.add('hidden');
+        resendBtn.classList.remove('hidden');
+      }
+    }, 1000);
+  }
+
+  function resendOTP() {
+    startCountdown();
+  }
+
+  // Form Submit Handler
+  form.addEventListener('submit', function (e) {
+    e.preventDefault();
+
+    btn.disabled = true;
+    btnSpinner.classList.remove('hidden');
+    btnArrow.classList.add('hidden');
+    const originalText = btnText.textContent;
+
+    if (currentMode === 'phone') {
+      btnText.textContent = 'در حال ارسال کد...';
+      setTimeout(() => {
+        btn.disabled = false;
+        btnSpinner.classList.add('hidden');
+        btnArrow.classList.remove('hidden');
+        showOtpSection();
+      }, 1500);
+    } else {
+      btnText.textContent = 'در حال بررسی...';
+      setTimeout(() => {
+        btn.disabled = false;
+        btnSpinner.classList.add('hidden');
+        btnArrow.classList.remove('hidden');
+        btnText.textContent = originalText;
+      }, 2000);
+    }
+  });
+</script>
+
+</body>
+</html>

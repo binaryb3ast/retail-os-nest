@@ -1,0 +1,643 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Invoxia - Enterprise Dashboard</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css" rel="stylesheet" type="text/css" />
+  <style>
+      body {
+          font-family: 'Vazirmatn', sans-serif;
+          background-color: #fafafa;
+          color: #111111;
+      }
+      .grid-bg-light {
+          background-image:
+                  linear-gradient(to right, rgba(0, 0, 0, 0.03) 1px, transparent 1px),
+                  linear-gradient(to bottom, rgba(0, 0, 0, 0.03) 1px, transparent 1px);
+          background-size: 40px 40px;
+      }
+      .custom-scrollbar::-webkit-scrollbar {
+          width: 4px;
+      }
+      .custom-scrollbar::-webkit-scrollbar-thumb {
+          background: #e5e5e5;
+          border-radius: 4px;
+      }
+      .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+          background: #cccccc;
+      }
+  </style>
+</head>
+<body class="bg-[#fafafa] min-h-screen flex overflow-x-hidden antialiased">
+
+<!-- Mobile Overlay backdrop -->
+<div id="sidebarBackdrop" onclick="toggleSidebar()" class="fixed inset-0 bg-black/40 z-40 lg:hidden hidden backdrop-blur-sm transition-opacity"></div>
+
+<!-- Right Sidebar -->
+<aside id="sidebar" class="fixed top-0 right-0 bottom-0 w-72 bg-white border-l border-gray-200/80 z-50 flex flex-col justify-between transition-transform duration-300 transform translate-x-full lg:translate-x-0 shadow-2xl lg:shadow-none">
+
+  <!-- Top Brand Header -->
+  <div class="p-6 flex items-center justify-between border-b border-gray-100">
+    <div class="flex items-center space-x-3 space-x-reverse group cursor-pointer">
+      <div class="w-10 h-10 bg-[#111111] text-white flex items-center justify-center font-black rounded-2xl text-base shadow-md group-hover:scale-105 transition-transform duration-300">
+        IX
+      </div>
+      <div class="flex flex-col">
+        <span class="text-lg font-black tracking-widest text-[#111111] uppercase leading-none">INVOXIA</span>
+        <span class="text-[10px] font-bold text-gray-400 uppercase tracking-wider mt-1">Enterprise Hub</span>
+      </div>
+    </div>
+    <button onclick="toggleSidebar()" class="lg:hidden text-gray-400 hover:text-black focus:outline-none p-1">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-6 h-6">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+      </svg>
+    </button>
+  </div>
+
+  <!-- Navigation Menu -->
+  <nav class="flex-1 p-4 space-y-1.5 overflow-y-auto custom-scrollbar text-right">
+    <div class="text-[11px] font-bold text-gray-400 px-3 my-2">منوی اصلی</div>
+
+    <!-- Active Item -->
+    <a href="#" class="flex items-center gap-3 px-3.5 py-3 rounded-2xl bg-[#111111] text-white font-bold text-xs shadow-lg shadow-black/10 transition-all">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5">
+        <path d="M11.47 3.841a.75.75 0 0 1 1.06 0l8.69 8.69a.75.75 0 1 1-1.06 1.061l-.97-.97v6.887a1.5 1.5 0 0 1-1.5 1.5H15a1.5 1.5 0 0 1-1.5-1.5v-4.5a.75.75 0 0 0-.75-.75h-1.5a.75.75 0 0 0-.75.75v4.5A1.5 1.5 0 0 1 9 21H5.25a1.5 1.5 0 0 1-1.5-1.5V12.62l-.97.97a.75.75 0 0 1-1.06-1.06l8.69-8.69Z" />
+      </svg>
+      <span>داشبورد اصلی</span>
+    </a>
+
+    <!-- Menu Item -->
+    <a href="#" class="flex items-center gap-3 px-3.5 py-3 rounded-2xl text-gray-600 hover:bg-gray-100 hover:text-black font-bold text-xs transition-all">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" class="w-5 h-5">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+        <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z" />
+      </svg>
+      <span>پایش و ردیابی</span>
+      <span class="mr-auto bg-gray-100 text-gray-800 text-[10px] font-black px-2 py-0.5 rounded-full border border-gray-200">1,240</span>
+    </a>
+
+    <!-- Menu Item -->
+    <a href="#" class="flex items-center gap-3 px-3.5 py-3 rounded-2xl text-gray-600 hover:bg-gray-100 hover:text-black font-bold text-xs transition-all">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" class="w-5 h-5">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 6a7.5 7.5 0 1 0 7.5 7.5h-7.5V6Z" />
+        <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 10.5H21A7.5 7.5 0 0 0 13.5 3v7.5Z" />
+      </svg>
+      <span>گزارش‌ها و تحلیل</span>
+    </a>
+
+    <div class="text-[11px] font-bold text-gray-400 px-3 pt-4 my-2">تنظیمات و مدیریت</div>
+
+    <!-- Collapsible Menu Item -->
+    <div>
+      <button onclick="toggleSubmenu('settingsSubmenu', 'submenuArrow')" class="w-full flex items-center justify-between px-3.5 py-3 rounded-2xl text-gray-600 hover:bg-gray-100 hover:text-black font-bold text-xs transition-all focus:outline-none">
+        <div class="flex items-center gap-3">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" class="w-5 h-5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.325.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 0 1 1.37.49l1.296 2.247a1.125 1.125 0 0 1-.26 1.431l-1.003.827c-.293.241-.438.613-.43.992a7.723 7.723 0 0 1 0 .255c-.008.378.137.75.43.991l1.004.827c.424.35.534.955.26 1.43l-1.298 2.247a1.125 1.125 0 0 1-1.369.491l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.47 6.47 0 0 1-.22.128c-.331.183-.581.495-.644.869l-.213 1.281c-.09.543-.56.94-1.11.94h-2.594c-.55 0-1.019-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 0 1-.22-.127c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 0 1-1.369-.49l-1.297-2.247a1.125 1.125 0 0 1 .26-1.431l1.004-.827c.292-.24.437-.613.43-.991a6.932 6.932 0 0 1 0-.255c.007-.38-.138-.751-.43-.992l-1.004-.827a1.125 1.125 0 0 1-.26-1.43l1.297-2.247a1.125 1.125 0 0 1 1.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.086.22-.128.332-.183.582-.495.644-.869l.214-1.28Z" />
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+          </svg>
+          <span>تنظیمات سیستم</span>
+        </div>
+        <svg id="submenuArrow" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-3.5 h-3.5 transition-transform duration-200">
+          <path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
+        </svg>
+      </button>
+
+      <div id="settingsSubmenu" class="hidden mr-6 my-1 space-y-1 border-r-2 border-gray-100 pr-3">
+        <a href="#" class="block px-3 py-2 rounded-xl text-gray-500 hover:text-black hover:bg-gray-50 font-bold text-xs transition-colors">دستگاه‌های متصل</a>
+        <a href="#" class="block px-3 py-2 rounded-xl text-gray-500 hover:text-black hover:bg-gray-50 font-bold text-xs transition-colors">کلیدهای API و امنیت</a>
+        <a href="#" class="block px-3 py-2 rounded-xl text-gray-500 hover:text-black hover:bg-gray-50 font-bold text-xs transition-colors">پیکربندی عمومی</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- User Profile Footer with Dropdown Trigger -->
+  <div class="p-4 border-t border-gray-100 bg-[#fbfbfb] relative">
+    <div class="flex items-center justify-between bg-white border border-gray-200/80 p-2.5 rounded-2xl shadow-sm">
+      <div class="flex items-center gap-3">
+        <div class="w-9 h-9 rounded-xl bg-[#111111] text-white flex items-center justify-center font-bold text-xs">
+          AH
+        </div>
+        <div class="flex flex-col text-right">
+          <span class="text-xs font-bold text-[#111111]">امیرحسین رضایی</span>
+          <span class="text-[10px] text-gray-400 font-medium">مدیر ارشد سیستم</span>
+        </div>
+      </div>
+
+      <!-- Profile Menu Trigger -->
+      <button onclick="toggleDropdown('profileDropdown')" type="button" class="text-gray-400 hover:text-black p-1.5 rounded-xl hover:bg-gray-100 transition-colors">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.75a.75.75 0 1 1 0-1.5.75.75 0 0 1 0 1.5Zm0 6a.75.75 0 1 1 0-1.5.75.75 0 0 1 0 1.5Zm0 6a.75.75 0 1 1 0-1.5.75.75 0 0 1 0 1.5Z" />
+        </svg>
+      </button>
+    </div>
+
+    <!-- Profile Dropdown Popup -->
+    <div id="profileDropdown" class="hidden absolute bottom-20 left-4 right-4 bg-white border border-gray-200 rounded-2xl shadow-xl p-2 z-50 text-right space-y-1">
+      <a href="#" class="flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-bold text-gray-700 hover:bg-gray-100 transition-colors">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" class="w-4 h-4 text-gray-500">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M17.982 18.725A7.488 7.488 0 0 0 12 15.75a7.488 7.488 0 0 0-5.982 2.975m11.963 0a9 9 0 1 0-11.963 0m11.963 0A8.966 8.966 0 0 1 12 21a8.966 8.966 0 0 1-5.982-2.275M15 9a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+        </svg>
+        ویرایش پروفایل
+      </a>
+      <button type="button" class="w-full flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-bold text-[#d30005] hover:bg-red-50 transition-colors">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" class="w-4 h-4">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15M12 9l-3 3m0 0 3 3m-3-3h12" />
+        </svg>
+        خروج از حساب کاربری
+      </button>
+    </div>
+  </div>
+</aside>
+
+<!-- Main Content Wrapper -->
+<div dir="rtl" class="flex-1 flex flex-col min-w-0 lg:pr-72 transition-all duration-300 ">
+
+  <!-- Top Header -->
+  <header class="sticky top-0 z-30 bg-white/95 backdrop-blur-md border-b border-gray-200/80 px-4 lg:px-8 py-3.5 flex items-center justify-between">
+
+    <!-- Search Bar -->
+    <div class="flex items-center gap-3 flex-1 max-w-md">
+      <button onclick="toggleSidebar()" type="button" aria-label="باز کردن منو" class="lg:hidden p-2 text-gray-600 hover:bg-gray-100 rounded-xl transition-colors">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-6 h-6">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
+        </svg>
+      </button>
+
+      <div class="relative w-full flex items-center">
+        <input
+          id="inventorySearchInput"
+          type="text"
+          placeholder="جستجو واریانت، کد کالا (SKU)، مدل گوشی..."
+          class="w-full bg-[#f5f5f5] text-[#111111] placeholder-[#9e9e9e] text-xs pr-10 pl-16 py-2.5 rounded-xl border border-transparent focus:border-[#111111] focus:bg-white focus:outline-none transition-all duration-200 text-right"
+        />
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4 text-gray-400 absolute right-3.5 pointer-events-none">
+          <path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
+        </svg>
+        <kbd class="hidden sm:inline-block absolute left-3 text-[10px] font-mono font-semibold text-gray-400 bg-white border border-gray-200 rounded px-1.5 py-0.5 shadow-sm select-none">
+          ⌘K
+        </kbd>
+      </div>
+    </div>
+
+    <!-- Actions Bar -->
+    <div class="flex items-center gap-3 relative">
+      <div class="hidden sm:flex items-center gap-2 bg-emerald-50 border border-emerald-200/80 px-3 py-1.5 rounded-full cursor-default select-none">
+        <span class="relative flex h-2 w-2">
+          <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-500 opacity-75"></span>
+          <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-600"></span>
+        </span>
+        <span class="text-[11px] font-bold text-emerald-700">همگام‌سازی لحظه‌ای انبارها</span>
+      </div>
+
+      <button type="button" class="text-xs font-bold bg-gray-100 hover:bg-black hover:text-white px-3 py-2 rounded-xl transition-all duration-200 cursor-pointer hidden sm:block">
+        FA / EN
+      </button>
+
+      <div class="relative">
+        <button onclick="toggleDropdown('notifDropdown')" type="button" aria-label="اعلان‌ها" class="relative p-2.5 bg-gray-100 hover:bg-gray-200 rounded-xl text-gray-700 transition-colors cursor-pointer">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" class="w-5 h-5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 0 0 5.454-1.31A8.967 8.967 0 0 0 18 9.75V9A6 6 0 0 0 6 9v.75a8.967 8.967 0 0 0-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 0 1-5.714 0m5.714 0a3 3 0 1 1-5.714 0" />
+          </svg>
+          <span class="absolute top-1.5 left-1.5 w-2 h-2 bg-rose-500 rounded-full ring-2 ring-white"></span>
+        </button>
+      </div>
+    </div>
+
+  </header>
+
+  <!-- MAIN INVENTORY CONTENT -->
+  <main class="p-4 lg:p-8 space-y-8 flex-1 bg-gray-50/50">
+
+    <!-- Header & Page Title -->
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div>
+        <h1 class="text-xl font-black text-gray-900">موجودی واریانت‌ها در انبارها (Warehouse Inventory)</h1>
+        <p class="text-xs text-gray-500 mt-1">مشاهده، مدیریت و جابه‌جایی موجودی واریانت محصولات به تفکیک انبارها</p>
+      </div>
+      <div class="flex items-center gap-2">
+        <button type="button" onclick="openTransferModal()" class="text-xs font-bold bg-white border border-gray-200/80 hover:bg-gray-50 text-gray-700 px-3.5 py-2.5 rounded-2xl transition-colors flex items-center gap-1.5 whitespace-nowrap shadow-sm">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" class="w-4 h-4">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M7.5 21L3 16.5m0 0L7.5 12M3 16.5h13.5m0-13.5L21 7.5m0 0L16.5 12M21 7.5H7.5" />
+          </svg>
+          انتقال بین انبارها
+        </button>
+        <button type="button" onclick="openInboundModal()" class="inline-flex items-center justify-center gap-2 bg-gray-900 hover:bg-black text-white text-xs font-bold px-4 py-2.5 rounded-2xl transition-all shadow-md cursor-pointer">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" /></svg>
+          افزایش موجودی (خرید جدید)
+        </button>
+      </div>
+    </div>
+
+    <!-- Metrics Cards Overview -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+
+      <!-- Card 1 -->
+      <div class="bg-white p-5 rounded-3xl border border-gray-200/80 shadow-sm">
+        <div class="flex items-center justify-between">
+          <span class="text-xs font-bold text-gray-500">کل موجودی فیزیکی</span>
+          <span class="w-8 h-8 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center font-bold text-xs">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M20.25 7.5l-.625 10.632a2.25 2.25 0 01-2.247 2.118H6.622a2.25 2.25 0 01-2.247-2.118L3.75 7.5M10 11.25h4M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125z" /></svg>
+          </span>
+        </div>
+        <div class="mt-4 flex items-baseline justify-between">
+          <span class="text-2xl font-black text-gray-900">۱,۴۲۰ <span class="text-xs text-gray-400 font-normal">عدد</span></span>
+          <span class="text-[10px] font-bold text-blue-600 bg-blue-50 px-2 py-0.5 rounded-full">در ۳ انبار</span>
+        </div>
+      </div>
+
+      <!-- Card 2 -->
+      <div class="bg-white p-5 rounded-3xl border border-gray-200/80 shadow-sm">
+        <div class="flex items-center justify-between">
+          <span class="text-xs font-bold text-gray-500">تنوع واریانت‌ها</span>
+          <span class="w-8 h-8 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center font-bold text-xs">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M6.429 9.75L2.25 12l4.179 2.25m0-4.5l5.571 3 5.571-3m-11.142 0L12 6.75l5.571 3m0 0l4.179-2.25L12 2.25 2.25 7.5l4.179 2.25m11.142 0l4.179 2.25-4.179 2.25m0 0L12 17.25l-5.571-3m11.142 0l-5.571 3-5.571-3" /></svg>
+          </span>
+        </div>
+        <div class="mt-4 flex items-baseline justify-between">
+          <span class="text-2xl font-black text-gray-900">۱۸۴ <span class="text-xs text-gray-400 font-normal">SKU</span></span>
+          <span class="text-[10px] font-bold text-purple-600 bg-purple-50 px-2 py-0.5 rounded-full">فعال</span>
+        </div>
+      </div>
+
+      <!-- Card 3 -->
+      <div class="bg-white p-5 rounded-3xl border border-gray-200/80 shadow-sm">
+        <div class="flex items-center justify-between">
+          <span class="text-xs font-bold text-gray-500">واریانت‌های روبه‌اتمام</span>
+          <span class="w-8 h-8 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center font-bold text-xs">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" /></svg>
+          </span>
+        </div>
+        <div class="mt-4 flex items-baseline justify-between">
+          <span class="text-2xl font-black text-amber-600">۱۲ <span class="text-xs text-amber-500 font-normal">مورد</span></span>
+          <span class="text-[10px] font-bold text-amber-700 bg-amber-50 px-2 py-0.5 rounded-full">زیر آستانه (۵)</span>
+        </div>
+      </div>
+
+      <!-- Card 4 -->
+      <div class="bg-white p-5 rounded-3xl border border-gray-200/80 shadow-sm">
+        <div class="flex items-center justify-between">
+          <span class="text-xs font-bold text-gray-500">کالاهای تمام شده</span>
+          <span class="w-8 h-8 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center font-bold text-xs">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" /></svg>
+          </span>
+        </div>
+        <div class="mt-4 flex items-baseline justify-between">
+          <span class="text-2xl font-black text-rose-600">۴ <span class="text-xs text-rose-400 font-normal">واریانت</span></span>
+          <span class="text-[10px] font-bold text-rose-600 bg-rose-50 px-2 py-0.5 rounded-full">نیازمند سفارش</span>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Toolbar Filters & Warehouse Tabs -->
+    <div class="bg-white p-4 sm:p-5 rounded-3xl border border-gray-200/80 shadow-sm space-y-4">
+
+      <!-- Top Filters -->
+      <div class="flex flex-col lg:flex-row items-center justify-between gap-4">
+
+        <!-- Search Input -->
+        <div class="w-full lg:w-96 relative">
+          <span class="absolute inset-y-0 right-0 flex items-center pr-3.5 pointer-events-none text-gray-400">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" /></svg>
+          </span>
+          <input type="text" placeholder="فیلتر بر اساس نام واریانت، مشخصه یا SKU..." class="w-full bg-gray-50 border border-gray-200 rounded-2xl pr-10 pl-4 py-2.5 text-xs text-gray-900 focus:border-black focus:bg-white outline-none transition-all">
+        </div>
+
+        <!-- Filters Dropdown -->
+        <div class="w-full lg:w-auto flex flex-wrap items-center gap-2">
+
+          <!-- Warehouse Select Filter -->
+          <select class="bg-gray-50 border border-gray-200 rounded-xl px-3 py-2.5 text-xs font-bold text-gray-700 focus:outline-none focus:border-black cursor-pointer">
+            <option value="all">همه انبارها (مجموع)</option>
+            <option value="wh1">انبار مرکزی (مرتضوی)</option>
+            <option value="wh2">انبار فروشگاه (علاءالدین)</option>
+            <option value="wh3">انبار آنلاین (پست/تیپاکس)</option>
+          </select>
+
+          <!-- Status Filter -->
+          <select class="bg-gray-50 border border-gray-200 rounded-xl px-3 py-2.5 text-xs font-bold text-gray-700 focus:outline-none focus:border-black cursor-pointer">
+            <option value="all">همه وضعیت‌های موجودی</option>
+            <option value="in_stock">موجود در انبار</option>
+            <option value="low_stock">رو به اتمام (Low Stock)</option>
+            <option value="out_of_stock">ناموجود (Out of Stock)</option>
+          </select>
+
+          <button type="button" class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-3.5 py-2.5 rounded-xl text-xs font-bold transition-colors">
+            بازنشانی
+          </button>
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- Inventory Table Container -->
+    <div class="bg-white rounded-3xl border border-gray-200/80 shadow-sm overflow-hidden relative">
+
+      <!-- Table Section -->
+      <div class="overflow-x-auto">
+        <table class="w-full text-right border-collapse">
+          <thead>
+          <tr class="bg-gray-50/70 text-gray-400 text-[11px] uppercase tracking-wider border-b border-gray-100 select-none">
+            <th class="py-3.5 px-4 text-center w-10">
+              <input type="checkbox" aria-label="انتخاب همه" class="rounded border-gray-300 text-black focus:ring-black cursor-pointer">
+            </th>
+            <th class="py-3.5 px-4 font-bold">محصول / واریانت (Variant)</th>
+            <th class="py-3.5 px-4 font-bold">کد شناسه (SKU)</th>
+            <th class="py-3.5 px-4 font-bold text-center">انبار مرکزی</th>
+            <th class="py-3.5 px-4 font-bold text-center">انبار علاءالدین</th>
+            <th class="py-3.5 px-4 font-bold text-center">انبار آنلاین</th>
+            <th class="py-3.5 px-4 font-bold text-center bg-gray-100/60">مجموع کل</th>
+            <th class="py-3.5 px-4 font-bold">وضعیت</th>
+            <th class="py-3.5 px-6 font-bold text-left">عملیات</th>
+          </tr>
+          </thead>
+          <tbody class="divide-y divide-gray-100 text-xs">
+
+          <!-- Variant Item 1 -->
+          <tr class="hover:bg-gray-50/60 transition-colors group">
+            <td class="py-4 px-4 text-center">
+              <input type="checkbox" aria-label="انتخاب واریانت" class="rounded border-gray-300 text-black focus:ring-black cursor-pointer">
+            </td>
+            <td class="py-4 px-4">
+              <div class="flex items-center gap-3">
+                <div class="w-9 h-9 rounded-xl bg-gray-100 border border-gray-200/80 flex items-center justify-center font-bold text-gray-700 text-xs overflow-hidden">
+                  <span class="w-4 h-4 rounded-full bg-black border border-gray-300"></span>
+                </div>
+                <div>
+                  <div class="font-black text-gray-900">سامسونگ Galaxy A12</div>
+                  <div class="text-[10px] text-gray-500 mt-0.5 flex items-center gap-1.5">
+                    <span>مشخصه: <strong class="text-gray-700">مشکی / 64GB / رم 4</strong></span>
+                  </div>
+                </div>
+              </div>
+            </td>
+            <td class="py-4 px-4 font-mono font-bold text-gray-500 text-xs">
+              SAM-A12-BLK-64
+            </td>
+
+            <!-- Stock per Warehouse -->
+            <td class="py-4 px-4 text-center font-mono font-bold text-gray-800">
+              ۳۵
+            </td>
+            <td class="py-4 px-4 text-center font-mono font-bold text-gray-800">
+              ۱۲
+            </td>
+            <td class="py-4 px-4 text-center font-mono font-bold text-gray-800">
+              ۸
+            </td>
+
+            <!-- Total Stock Column -->
+            <td class="py-4 px-4 text-center font-mono font-black text-gray-900 bg-gray-50/80 text-sm">
+              ۵۵
+            </td>
+
+            <td class="py-4 px-4 whitespace-nowrap">
+                <span class="inline-flex items-center gap-1.5 bg-emerald-50 text-emerald-700 border border-emerald-200/60 px-2.5 py-1 rounded-xl text-[10px] font-black">
+                  <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                  موجود
+                </span>
+            </td>
+            <td class="py-4 px-6 text-left whitespace-nowrap">
+              <div class="flex items-center justify-end gap-1.5">
+                <button type="button" onclick="openTransferModal('SAM-A12-BLK-64')" title="انتقال بین انبارها" class="p-1.5 text-gray-500 hover:text-black hover:bg-gray-100 rounded-lg transition-colors">
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" class="w-4 h-4">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M7.5 21L3 16.5m0 0L7.5 12M3 16.5h13.5m0-13.5L21 7.5m0 0L16.5 12M21 7.5H7.5" />
+                  </svg>
+                </button>
+                <button type="button" onclick="openAdjustModal('SAM-A12-BLK-64')" class="text-xs font-bold bg-gray-100 hover:bg-black hover:text-white text-gray-800 px-3 py-1.5 rounded-xl transition-all">
+                  تعدیل موجودی
+                </button>
+              </div>
+            </td>
+          </tr>
+
+          <!-- Variant Item 2 (Low Stock Warning) -->
+          <tr class="hover:bg-gray-50/60 transition-colors group">
+            <td class="py-4 px-4 text-center">
+              <input type="checkbox" aria-label="انتخاب واریانت" class="rounded border-gray-300 text-black focus:ring-black cursor-pointer">
+            </td>
+            <td class="py-4 px-4">
+              <div class="flex items-center gap-3">
+                <div class="w-9 h-9 rounded-xl bg-gray-100 border border-gray-200/80 flex items-center justify-center font-bold text-gray-700 text-xs overflow-hidden">
+                  <span class="w-4 h-4 rounded-full bg-blue-500 border border-gray-300"></span>
+                </div>
+                <div>
+                  <div class="font-black text-gray-900">کاور سیلیکونی iPhone 13</div>
+                  <div class="text-[10px] text-gray-500 mt-0.5">
+                    <span>مشخصه: <strong class="text-gray-700">آبی اقیانوسی / ویتنام</strong></span>
+                  </div>
+                </div>
+              </div>
+            </td>
+            <td class="py-4 px-4 font-mono font-bold text-gray-500 text-xs">
+              COV-IP13-BLU
+            </td>
+
+            <td class="py-4 px-4 text-center font-mono font-bold text-gray-800">
+              ۲
+            </td>
+            <td class="py-4 px-4 text-center font-mono font-bold text-rose-600 font-black">
+              ۰
+            </td>
+            <td class="py-4 px-4 text-center font-mono font-bold text-gray-800">
+              ۱
+            </td>
+
+            <!-- Total Stock Column -->
+            <td class="py-4 px-4 text-center font-mono font-black text-amber-600 bg-amber-50/30 text-sm">
+              ۳
+            </td>
+
+            <td class="py-4 px-4 whitespace-nowrap">
+                <span class="inline-flex items-center gap-1.5 bg-amber-50 text-amber-700 border border-amber-200/60 px-2.5 py-1 rounded-xl text-[10px] font-black">
+                  <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
+                  کمتر از حد مجاز
+                </span>
+            </td>
+            <td class="py-4 px-6 text-left whitespace-nowrap">
+              <div class="flex items-center justify-end gap-1.5">
+                <button type="button" onclick="openTransferModal('COV-IP13-BLU')" title="انتقال بین انبارها" class="p-1.5 text-gray-500 hover:text-black hover:bg-gray-100 rounded-lg transition-colors">
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" class="w-4 h-4">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M7.5 21L3 16.5m0 0L7.5 12M3 16.5h13.5m0-13.5L21 7.5m0 0L16.5 12M21 7.5H7.5" />
+                  </svg>
+                </button>
+                <button type="button" onclick="openAdjustModal('COV-IP13-BLU')" class="text-xs font-bold bg-gray-100 hover:bg-black hover:text-white text-gray-800 px-3 py-1.5 rounded-xl transition-all">
+                  تعدیل موجودی
+                </button>
+              </div>
+            </td>
+          </tr>
+
+          <!-- Variant Item 3 (Out of Stock) -->
+          <tr class="hover:bg-gray-50/60 transition-colors group">
+            <td class="py-4 px-4 text-center">
+              <input type="checkbox" aria-label="انتخاب واریانت" class="rounded border-gray-300 text-black focus:ring-black cursor-pointer">
+            </td>
+            <td class="py-4 px-4">
+              <div class="flex items-center gap-3">
+                <div class="w-9 h-9 rounded-xl bg-gray-100 border border-gray-200/80 flex items-center justify-center font-bold text-gray-700 text-xs overflow-hidden">
+                  <span class="w-4 h-4 rounded-full bg-transparent border border-gray-400"></span>
+                </div>
+                <div>
+                  <div class="font-black text-gray-900">گلس پرایوسی Xiaomi Note 11</div>
+                  <div class="text-[10px] text-gray-500 mt-0.5">
+                    <span>مشخصه: <strong class="text-gray-700">آنتی فول 9H</strong></span>
+                  </div>
+                </div>
+              </div>
+            </td>
+            <td class="py-4 px-4 font-mono font-bold text-gray-500 text-xs">
+              GLS-N11-PRV
+            </td>
+
+            <td class="py-4 px-4 text-center font-mono font-bold text-gray-400">
+              ۰
+            </td>
+            <td class="py-4 px-4 text-center font-mono font-bold text-gray-400">
+              ۰
+            </td>
+            <td class="py-4 px-4 text-center font-mono font-bold text-gray-400">
+              ۰
+            </td>
+
+            <td class="py-4 px-4 text-center font-mono font-black text-rose-600 bg-rose-50/40 text-sm">
+              ۰
+            </td>
+
+            <td class="py-4 px-4 whitespace-nowrap">
+                <span class="inline-flex items-center gap-1.5 bg-rose-50 text-rose-700 border border-rose-200/60 px-2.5 py-1 rounded-xl text-[10px] font-black">
+                  <span class="w-1.5 h-1.5 rounded-full bg-rose-500"></span>
+                  ناموجود
+                </span>
+            </td>
+            <td class="py-4 px-6 text-left whitespace-nowrap">
+              <div class="flex items-center justify-end gap-1.5">
+                <button type="button" onclick="openInboundModal('GLS-N11-PRV')" class="text-xs font-bold bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1.5 rounded-xl transition-all shadow-sm">
+                  سفارش خرید
+                </button>
+              </div>
+            </td>
+          </tr>
+
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Pagination Footer -->
+      <div class="p-4 border-t border-gray-100 bg-gray-50/50 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs">
+        <span class="text-gray-500 font-bold">نمایش ۱ تا ۳ از ۱۸۴ واریانت کالا</span>
+        <div class="flex items-center gap-1.5">
+          <button type="button" class="px-3 py-1.5 rounded-xl border border-gray-200 bg-white hover:bg-gray-100 font-bold text-gray-700 transition-colors">قبلی</button>
+          <button type="button" class="px-3.5 py-1.5 rounded-xl bg-[#111111] text-white font-black">۱</button>
+          <button type="button" class="px-3.5 py-1.5 rounded-xl border border-gray-200 bg-white hover:bg-gray-100 font-bold text-gray-700 transition-colors">۲</button>
+          <button type="button" class="px-3.5 py-1.5 rounded-xl border border-gray-200 bg-white hover:bg-gray-100 font-bold text-gray-700 transition-colors">بعدی</button>
+        </div>
+      </div>
+
+    </div>
+
+  </main>
+</div>
+
+<!-- ================= MODAL 1: TRANSFER BETWEEN WAREHOUSES ================= -->
+<div id="transferModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4 hidden">
+  <div class="bg-white w-full max-w-lg rounded-3xl shadow-2xl border border-gray-100 overflow-hidden dir-rtl text-right">
+
+    <div class="px-6 py-4 bg-gray-50 border-b border-gray-100 flex items-center justify-between">
+      <div class="flex items-center gap-2">
+        <span class="w-3 h-3 rounded-full bg-blue-500"></span>
+        <h3 class="font-black text-gray-900 text-sm">جابه‌جایی بین انبارها (Stock Transfer)</h3>
+      </div>
+      <button onclick="closeTransferModal()" class="text-gray-400 hover:text-gray-700 p-1 rounded-xl transition-colors">✕</button>
+    </div>
+
+    <form class="p-6 space-y-4">
+      <div>
+        <label class="block text-xs font-bold text-gray-700 mb-1.5">انتخاب واریانت کالا</label>
+        <select class="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2.5 text-xs font-bold text-gray-800 focus:outline-none focus:border-black">
+          <option>سامسونگ Galaxy A12 (مشکی / 64GB) — SKU: SAM-A12-BLK-64</option>
+          <option>کاور سیلیکونی iPhone 13 (آبی اقیانوسی) — SKU: COV-IP13-BLU</option>
+        </select>
+      </div>
+
+      <div class="grid grid-cols-2 gap-4">
+        <div>
+          <label class="block text-xs font-bold text-gray-700 mb-1.5">انبار مبدأ</label>
+          <select class="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2.5 text-xs font-bold text-gray-800 focus:outline-none focus:border-black">
+            <option>انبار مرکزی (موجودی: ۳۵)</option>
+            <option>انبار علاءالدین (موجودی: ۱۲)</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-gray-700 mb-1.5">انبار مقصد</label>
+          <select class="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2.5 text-xs font-bold text-gray-800 focus:outline-none focus:border-black">
+            <option>انبار علاءالدین</option>
+            <option>انبار آنلاین (پست)</option>
+            <option>انبار مرکزی</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-2 gap-4">
+        <div>
+          <label class="block text-xs font-bold text-gray-700 mb-1.5">تعداد انتقال</label>
+          <input type="number" min="1" value="5" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2.5 text-xs font-mono font-bold text-gray-800 focus:outline-none focus:border-black">
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-gray-700 mb-1.5">مسئول جابه‌جایی / پیک</label>
+          <input type="text" placeholder="نام پیک یا انباردار" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2.5 text-xs text-gray-800 focus:outline-none focus:border-black">
+        </div>
+      </div>
+
+      <div class="pt-3 border-t border-gray-100 flex items-center justify-end gap-2">
+        <button type="button" onclick="closeTransferModal()" class="px-4 py-2.5 rounded-xl border border-gray-200 text-xs font-bold text-gray-600 hover:bg-gray-100">انصراف</button>
+        <button type="submit" class="px-5 py-2.5 rounded-xl bg-black hover:bg-gray-800 text-white text-xs font-bold transition-all shadow-md">ثبت جابه‌جایی موجودی</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+  // Toggle Mobile Sidebar
+  function toggleSidebar() {
+    const sidebar = document.getElementById('sidebar');
+    const backdrop = document.getElementById('sidebarBackdrop');
+    const isOpen = !sidebar.classList.contains('translate-x-full');
+
+    if (isOpen) {
+      sidebar.classList.add('translate-x-full');
+      backdrop.classList.add('hidden');
+    } else {
+      sidebar.classList.remove('translate-x-full');
+      backdrop.classList.remove('hidden');
+    }
+  }
+
+  // Generic Dropdown Toggle
+  function toggleDropdown(elementId) {
+    const dropdown = document.getElementById(elementId);
+    dropdown.classList.toggle('hidden');
+  }
+
+  // Toggle Submenu
+  function toggleSubmenu(submenuId, arrowId) {
+    const submenu = document.getElementById(submenuId);
+    const arrow = document.getElementById(arrowId);
+    submenu.classList.toggle('hidden');
+    arrow.classList.toggle('rotate-180');
+  }
+
+  // Keyboard Shortcut Ctrl+K / Cmd+K for Search Focus
+  document.addEventListener('keydown', function(e) {
+    if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+      e.preventDefault();
+      document.getElementById('searchInput').focus();
+    }
+  });
+</script>
+
+</body>
+</html>

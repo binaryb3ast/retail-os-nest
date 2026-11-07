@@ -28,12 +28,18 @@ export class AuthenticationService {
   ): Promise<IssuedSession> {
     let normalizedValue: string | null = null;
     try {
-      normalizedValue = normalizeIdentity(identityType, identityValue).normalizedValue;
+      normalizedValue = normalizeIdentity(
+        identityType,
+        identityValue,
+      ).normalizedValue;
     } catch {
       // Invalid and unknown identities follow the same failure path.
     }
     const identity = normalizedValue
-      ? await this.identities.findForAuthentication(identityType, normalizedValue)
+      ? await this.identities.findForAuthentication(
+          identityType,
+          normalizedValue,
+        )
       : null;
 
     const userId = identity?.userId;
@@ -43,39 +49,59 @@ export class AuthenticationService {
           this.users.getAuthenticationState(userId),
         ])
       : [null, null];
-    const passwordMatches = await this.credentials.verifyPassword(password, credential);
-    const isLocked = Boolean(credential?.lockedUntil && credential.lockedUntil > new Date());
+    const passwordMatches = await this.credentials.verifyPassword(
+      password,
+      credential,
+    );
+    const isLocked = Boolean(
+      credential?.lockedUntil && credential.lockedUntil > new Date(),
+    );
     const canAuthenticate = Boolean(
       identity?.isVerified &&
-        user?.status === 'ACTIVE' &&
-        credential &&
-        passwordMatches &&
-        !isLocked,
+      user?.status === 'ACTIVE' &&
+      credential &&
+      passwordMatches &&
+      !isLocked,
     );
 
     if (!canAuthenticate || !user || !credential || !userId || !identity) {
-      if (credential) await this.credentials.recordFailedAttempt(credential.userId);
+      if (credential)
+        await this.credentials.recordFailedAttempt(credential.userId);
       throw this.authenticationFailed();
     }
 
     const actor = { type: 'USER', userId } as const;
     try {
       return await this.transactions.execute(async (session) => {
-        const currentIdentity = await this.identities.findForAuthenticationById(identity.id, session);
-        const currentUser = await this.users.getAuthenticationState(userId, session);
+        const currentIdentity = await this.identities.findForAuthenticationById(
+          identity.id,
+          session,
+        );
+        const currentUser = await this.users.getAuthenticationState(
+          userId,
+          session,
+        );
         if (
           !currentIdentity?.isVerified ||
           currentIdentity.userId.toString() !== userId.toString() ||
           !currentUser ||
           currentUser.status !== 'ACTIVE' ||
           currentUser.authVersion !== user.authVersion ||
-          credential.lockedUntil && credential.lockedUntil > new Date()
+          (credential.lockedUntil && credential.lockedUntil > new Date())
         ) {
           throw this.authenticationFailed();
         }
 
-        await this.credentials.resetFailedAttempts(userId, credential.revision, session);
-        const issued = await this.sessions.issueInTransaction(currentUser, actor, session);
+        await this.credentials.resetFailedAttempts(
+          userId,
+          credential.revision,
+          session,
+        );
+        const issued = await this.sessions.issueInTransaction(
+          currentUser,
+          actor,
+          session,
+        );
         await this.audit.record(
           {
             action: 'AUTH.LOGIN_SUCCEEDED',
@@ -105,7 +131,11 @@ export class AuthenticationService {
     principal: { readonly userId: Types.ObjectId },
   ): Promise<void> {
     if (!isValidObjectId(principal.userId)) throw this.authenticationFailed();
-    await this.sessions.revoke(token, { type: 'USER', userId: principal.userId }, 'LOGOUT');
+    await this.sessions.revoke(
+      token,
+      { type: 'USER', userId: principal.userId },
+      'LOGOUT',
+    );
   }
 
   private authenticationFailed(): ApplicationException {

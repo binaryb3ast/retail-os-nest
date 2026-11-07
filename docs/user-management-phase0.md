@@ -1,13 +1,15 @@
 # User Management — Phase 0 Prerequisites
 
-Status: prerequisite review for the approved User Management architecture. This note records verified repository facts, recommended integration contracts, and launch gates. It does not implement user, authentication, or authorization features.
+Status: prerequisite review for the approved User Management architecture. This note records verified repository facts, integration contracts, and launch gates.
 
 ## Repository facts
 
-- There is no Branch model, module, service, or deployment definition for Branch data.
+- The Branch domain now owns the `branches` collection through `BranchesModule` and `BranchesService`. It exposes active-branch lookup and does not provide HTTP administration routes.
 - `DatabaseTransactionService` is available. The database guide and `.env.example` state that multi-document transactions require a replica set; the example URI uses `replicaSet=rs0`.
 - Production turns Mongoose `autoIndex` off. Domain indexes therefore need an explicit deployment/startup provisioning strategy.
-- The repository has no email/SMS delivery provider, authentication module, general audit service, ingress configuration, or production deployment manifest.
+- Authentication and dashboard controllers expose login/logout/current-user and permission-guarded administration APIs. The static dashboard is served at `/admin`.
+- Branch membership, role, role-assignment, and centralized authorization services are available internally. The permission catalog is code-defined; authorization checks have no cache.
+- The repository has no email/SMS delivery provider, ingress configuration, or production deployment manifest.
 - Request context provides request and correlation IDs. It does not provide an authenticated actor.
 
 References: [MongoDB infrastructure guide](database/README.md), [Core infrastructure guide](core-infrastructure.md), and [.env.example](../.env.example).
@@ -28,11 +30,11 @@ export interface BranchDirectory {
 
 The Branch module owns collection naming, schema, ObjectId conversion, and active/deactivated state. A missing or inactive branch returns `null`. Membership creation and every branch authorization decision call this contract. Branch deletion/deactivation must preserve historical references and prevent new branch operations. Whether deactivation also suspends memberships is a business decision; authorization must deny access while the Branch itself is inactive regardless.
 
-The first concrete provider cannot be wired until a Branch module exists. Phase 1 may proceed with user and identity records, but branch memberships and branch-scoped roles remain gated on that provider.
+The Branch module is now the concrete provider for this contract. Membership creation and branch-scoped role work can depend on `BranchesService.findActiveById`. Branch memberships are stored separately and require an active Branch before a membership can be active. Deployment still needs the Branch and membership indexes provisioned before writes are enabled.
 
 ## Administrator bootstrap
 
-Recommended mechanism: a one-shot, operator-invoked command or deployment job that runs inside the application context. It is not an HTTP endpoint and is not enabled as part of normal application startup.
+Implemented mechanism: `npm run bootstrap:admin`, a one-shot operator command that runs inside the application context. It is not an HTTP endpoint and is not enabled during normal startup. It prompts for the administrator email and hides password input.
 
 The operation should:
 
@@ -40,9 +42,9 @@ The operation should:
 2. Seed protected system roles idempotently from code before assigning one.
 3. Create the first administrator, identity, password credential, role assignment, and audit event in one transaction.
 4. Accept initial credentials through a secret input channel that does not echo or write them to logs. Hash the password before persistence; never emit a generated password to CI logs.
-5. Record a bootstrap actor marker and request/operation ID in the audit event.
+5. Record an `initial-admin` marker and bootstrap audit events in the same transaction.
 
-This keeps the initial trust path out of public routes. The exact operator command, secret-delivery method, and recovery approval process must be selected with the deployment owner before authentication routes are enabled.
+The command refuses to run after the marker or `SYSTEM_ADMIN` role exists. MongoDB must support transactions. The command has not been run against any environment as part of this implementation.
 
 ## Identity verification and recovery delivery
 
@@ -76,22 +78,26 @@ Owner/deployment decision needed: confirm production MongoDB topology, index rol
 
 ## Rate limiting and launch boundary
 
-There is no ingress or rate-limit configuration in the repository. Before password login is exposed, deployment must provide rate limiting that is effective across all application instances. Per-account failed-attempt tracking is a second control, not a replacement for shared IP/edge throttling.
+The login route now has an application-level MongoDB rate limit shared across application instances, keyed by a hash of normalized identity and client address, plus existing per-account failed-attempt lockout. No ingress or rate-limit configuration exists in the repository; deployment should add edge throttling as a second layer.
 
 The login response must not reveal whether an identity exists, whether a password is wrong, or whether an account is suspended. The same rule applies to recovery requests. Do not mount user administration routes before the bootstrap path, session guard, permission guard, and initial privileged role are ready.
 
-Owner/deployment decision needed: identify the gateway/ingress owner and confirm rate-limit policy for login, identity verification, and password recovery.
+Owner/deployment decision needed: identify the gateway/ingress owner and confirm edge throttling policy. Identity verification and password recovery remain unavailable until delivery is configured.
 
 ## Phase 0 readiness checklist
 
 | Gate | Current assessment | Required before |
 |---|---|---|
-| Branch service contract | Specified above; provider absent | Membership implementation |
-| Bootstrap path | Recommended offline command/job; operational details unselected | First protected admin route |
+| Branch service contract | Implemented by `BranchesService.findActiveById` | Branch membership and branch-scoped role writes |
+| Bootstrap path | Implemented as `npm run bootstrap:admin`; not executed | First administrator setup |
 | Identity delivery | No provider; public activation/recovery deferred | Invite/verification/reset flows |
 | Audit retention | No policy; automatic cleanup deferred | Production audit rollout |
 | Production replica set | Required by code/docs; production topology unverified | Multi-document writes |
 | Index provisioning | `autoIndex` disabled in production; deployment process absent | User/identity data traffic |
-| Shared rate limiting | No ingress config found | Public login/recovery |
+| Shared rate limiting | MongoDB-backed login throttling implemented; ingress policy absent | Production login exposure |
 
-Once the deployment and product owners confirm the items marked as decisions, Phase 1 can implement user and identity records. The Branch provider and delivery channel remain separate dependencies for membership and activation flows.
+The Branch provider and local bootstrap/login paths are implemented. Delivery, edge throttling, production topology, index rollout, and audit retention decisions remain open.
+
+Authorization semantics: system-role permissions apply globally. On a request with branch context, the user must also have an active membership in that active branch; system and branch role permissions are then combined. Role and membership state is read on each authorization check. The bootstrap command creates the initial `SYSTEM_ADMIN` role; role listing is available to authorized dashboard sessions, while role write and assignment routes remain unavailable.
+
+HTTP integration: dashboard routes declare `@RequirePermission(...)` and apply `SessionGuard` before `PermissionGuard`. The permission guard reads branch context from the route's `branchId` parameter. Dashboard scope is limited to user, branch, and role summaries plus real audit activity. Custom role create/update/deactivation is exposed; sales, inventory, email invitations, identity verification, and role assignment management are not exposed.

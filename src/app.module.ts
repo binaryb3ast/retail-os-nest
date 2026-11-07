@@ -7,6 +7,10 @@ import { CoreModule } from './core/core.module';
 import { SettingsModule } from './settings/settings.module';
 import { UserManagementModule } from './user-management/user-management.module';
 import { AuthenticationModule } from './authentication/authentication.module';
+import { BranchesModule } from './branches/branches.module';
+import { BranchMembershipsModule } from './branch-memberships/branch-memberships.module';
+import { AuthorizationModule } from './authorization/authorization.module';
+import { DashboardModule } from './dashboard/dashboard.module';
 
 @Module({
   imports: [
@@ -16,6 +20,10 @@ import { AuthenticationModule } from './authentication/authentication.module';
     SettingsModule,
     UserManagementModule,
     AuthenticationModule,
+    BranchesModule,
+    BranchMembershipsModule,
+    AuthorizationModule,
+    DashboardModule,
   ],
   controllers: [AppController],
   providers: [AppService],

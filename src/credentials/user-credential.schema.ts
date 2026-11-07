@@ -1,9 +1,18 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument, Schema as MongooseSchema, Types } from 'mongoose';
 
-@Schema({ collection: 'user_credentials', timestamps: true, strict: 'throw', versionKey: false })
+@Schema({
+  collection: 'user_credentials',
+  timestamps: true,
+  strict: 'throw',
+  versionKey: false,
+})
 export class UserCredentialRecord {
-  @Prop({ type: MongooseSchema.Types.ObjectId, required: true, ref: 'UserRecord' })
+  @Prop({
+    type: MongooseSchema.Types.ObjectId,
+    required: true,
+    ref: 'UserRecord',
+  })
   userId!: Types.ObjectId;
 
   @Prop({ type: String, required: true, select: false })
@@ -29,5 +38,9 @@ export class UserCredentialRecord {
 }
 
 export type UserCredentialDocument = HydratedDocument<UserCredentialRecord>;
-export const UserCredentialSchema = SchemaFactory.createForClass(UserCredentialRecord);
-UserCredentialSchema.index({ userId: 1 }, { unique: true, name: 'uniq_credential_per_user' });
+export const UserCredentialSchema =
+  SchemaFactory.createForClass(UserCredentialRecord);
+UserCredentialSchema.index(
+  { userId: 1 },
+  { unique: true, name: 'uniq_credential_per_user' },
+);

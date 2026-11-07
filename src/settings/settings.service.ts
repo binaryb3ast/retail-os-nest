@@ -1,7 +1,8 @@
 import { HttpStatus, Injectable, Logger, OnModuleInit } from '@nestjs/common';
-import { InjectConnection, InjectModel } from '@nestjs/mongoose';
+import { InjectModel } from '@nestjs/mongoose';
 import { isValidObjectId, Types } from 'mongoose';
-import type { ClientSession, Connection, Model } from 'mongoose';
+import type { ClientSession, Model } from 'mongoose';
+import { BranchesService } from '../branches/branches.service';
 import { RequestContextService } from '../core/request-context/request-context.service';
 import { DatabaseTransactionService } from '../infrastructure/database/database-transaction.service';
 import type { SettingTarget } from './domain/setting-scope';
@@ -36,7 +37,7 @@ export class SettingsService implements OnModuleInit {
     private readonly settings: Model<SettingRecord>,
     @InjectModel(SettingAuditRecord.name)
     private readonly audits: Model<SettingAuditRecord>,
-    @InjectConnection() private readonly connection: Connection,
+    private readonly branches: BranchesService,
     private readonly transactions: DatabaseTransactionService,
     private readonly requestContext: RequestContextService,
   ) {}
@@ -422,12 +423,7 @@ export class SettingsService implements OnModuleInit {
     branchId: Types.ObjectId,
     session?: ClientSession,
   ): Promise<void> {
-    const branch = await this.connection
-      .collection('branches')
-      .findOne(
-        { _id: branchId },
-        { projection: { _id: 1 }, ...(session ? { session } : {}) },
-      );
+    const branch = await this.branches.findActiveById(branchId, session);
     if (!branch)
       throw settingException(
         'BRANCH_NOT_FOUND',

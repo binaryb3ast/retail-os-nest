@@ -21,11 +21,22 @@ export class AuditEventRecord {
       'USER.IDENTITY_ADDED',
       'USER.IDENTITY_REMOVED',
       'USER.IDENTITY_PRIMARY_CHANGED',
-    'USER.PASSWORD_SET',
-    'USER.PASSWORD_CHANGED',
-    'AUTH.LOGIN_SUCCEEDED',
-    'AUTH.SESSION_CREATED',
-    'AUTH.SESSION_REVOKED',
+      'USER.PASSWORD_SET',
+      'USER.PASSWORD_CHANGED',
+      'AUTH.LOGIN_SUCCEEDED',
+      'AUTH.SESSION_CREATED',
+      'AUTH.SESSION_REVOKED',
+      'BRANCH.CREATED',
+      'BRANCH.STATUS_CHANGED',
+      'BRANCH_MEMBERSHIP.CREATED',
+      'BRANCH_MEMBERSHIP.STATUS_CHANGED',
+      'ROLE.CREATED',
+      'ROLE.SYSTEM_CREATED',
+      'ROLE.UPDATED',
+      'ROLE.STATUS_CHANGED',
+      'ROLE_ASSIGNMENT.CREATED',
+      'ROLE_ASSIGNMENT.REACTIVATED',
+      'ROLE_ASSIGNMENT.REVOKED',
     ],
     immutable: true,
   })
@@ -48,10 +59,17 @@ export class AuditEventRecord {
   @Prop({
     type: String,
     required: true,
-    enum: ['USER', 'IDENTITY'],
+    enum: [
+      'USER',
+      'IDENTITY',
+      'BRANCH',
+      'BRANCH_MEMBERSHIP',
+      'ROLE',
+      'ROLE_ASSIGNMENT',
+    ],
     immutable: true,
   })
-  targetType!: 'USER' | 'IDENTITY';
+  targetType!: 'USER' | 'IDENTITY' | 'BRANCH';
 
   @Prop({
     type: MongooseSchema.Types.ObjectId,
@@ -60,12 +78,8 @@ export class AuditEventRecord {
   })
   targetId!: Types.ObjectId;
 
-  @Prop({
-    type: MongooseSchema.Types.ObjectId,
-    required: true,
-    immutable: true,
-  })
-  userId!: Types.ObjectId;
+  @Prop({ type: MongooseSchema.Types.ObjectId, default: null, immutable: true })
+  userId!: Types.ObjectId | null;
 
   @Prop({
     type: String,
@@ -90,6 +104,77 @@ export class AuditEventRecord {
     immutable: true,
   })
   newStatus!: UserStatus | null;
+
+  @Prop({
+    type: String,
+    enum: ['ACTIVE', 'DEACTIVATED'],
+    default: null,
+    immutable: true,
+  })
+  previousBranchStatus!: 'ACTIVE' | 'DEACTIVATED' | null;
+
+  @Prop({
+    type: String,
+    enum: ['ACTIVE', 'DEACTIVATED'],
+    default: null,
+    immutable: true,
+  })
+  newBranchStatus!: 'ACTIVE' | 'DEACTIVATED' | null;
+
+  @Prop({
+    type: String,
+    enum: ['ACTIVE', 'SUSPENDED', 'REVOKED'],
+    default: null,
+    immutable: true,
+  })
+  previousMembershipStatus!: 'ACTIVE' | 'SUSPENDED' | 'REVOKED' | null;
+
+  @Prop({
+    type: String,
+    enum: ['ACTIVE', 'SUSPENDED', 'REVOKED'],
+    default: null,
+    immutable: true,
+  })
+  newMembershipStatus!: 'ACTIVE' | 'SUSPENDED' | 'REVOKED' | null;
+
+  @Prop({ type: String, default: null, maxlength: 48, immutable: true })
+  roleCode!: string | null;
+
+  @Prop({ type: [String], default: null, immutable: true })
+  previousPermissions!: readonly string[] | null;
+
+  @Prop({ type: [String], default: null, immutable: true })
+  newPermissions!: readonly string[] | null;
+
+  @Prop({ type: Boolean, default: null, immutable: true })
+  previousRoleActive!: boolean | null;
+
+  @Prop({ type: Boolean, default: null, immutable: true })
+  newRoleActive!: boolean | null;
+
+  @Prop({
+    type: String,
+    enum: ['SYSTEM', 'BRANCH'],
+    default: null,
+    immutable: true,
+  })
+  assignmentScope!: 'SYSTEM' | 'BRANCH' | null;
+
+  @Prop({
+    type: String,
+    enum: ['ACTIVE', 'REVOKED'],
+    default: null,
+    immutable: true,
+  })
+  previousAssignmentStatus!: 'ACTIVE' | 'REVOKED' | null;
+
+  @Prop({
+    type: String,
+    enum: ['ACTIVE', 'REVOKED'],
+    default: null,
+    immutable: true,
+  })
+  newAssignmentStatus!: 'ACTIVE' | 'REVOKED' | null;
 
   @Prop({ type: MongooseSchema.Types.ObjectId, default: null, immutable: true })
   branchId!: Types.ObjectId | null;

@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
+import { BranchesModule } from '../branches/branches.module';
 import { RequestContextModule } from '../core/request-context/request-context.module';
 import { DatabaseModule } from '../infrastructure/database/database.module';
 import {
@@ -13,6 +14,7 @@ import { SettingsService } from './settings.service';
 @Module({
   imports: [
     DatabaseModule,
+    BranchesModule,
     RequestContextModule,
     MongooseModule.forFeature([
       { name: SettingRecord.name, schema: SettingSchema },

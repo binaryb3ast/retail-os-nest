@@ -46,6 +46,14 @@ export interface AuthenticationUserState {
   readonly authVersion: number;
 }
 
+export interface UserListResult {
+  readonly data: readonly UserProfile[];
+  readonly page: number;
+  readonly limit: number;
+  readonly total: number;
+  readonly pageCount: number;
+}
+
 const statusTransitions: Readonly<Record<UserStatus, readonly UserStatus[]>> = {
   INVITED: ['ACTIVE', 'DEACTIVATED'],
   ACTIVE: ['SUSPENDED', 'DEACTIVATED'],
@@ -141,6 +149,57 @@ export class UsersService {
     return this.toProfile(user);
   }
 
+  async listAdmin(input: {
+    readonly page: number;
+    readonly limit: number;
+    readonly search?: string;
+    readonly status?: UserStatus;
+  }): Promise<UserListResult> {
+    const filter: Record<string, unknown> = {};
+    if (input.status) filter.status = input.status;
+    const search = input.search?.trim().slice(0, 100);
+    if (search) {
+      const escaped = search.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      filter.$or = [
+        { firstName: { $regex: escaped, $options: 'i' } },
+        { lastName: { $regex: escaped, $options: 'i' } },
+        { displayName: { $regex: escaped, $options: 'i' } },
+      ];
+    }
+    const skip = (input.page - 1) * input.limit;
+    const [records, total] = await Promise.all([
+      this.users
+        .find(filter)
+        .sort({ createdAt: -1, _id: -1 })
+        .skip(skip)
+        .limit(input.limit)
+        .exec(),
+      this.users.countDocuments(filter).exec(),
+    ]);
+    return {
+      data: records.map((user) => this.toProfile(user)),
+      page: input.page,
+      limit: input.limit,
+      total,
+      pageCount: Math.ceil(total / input.limit),
+    };
+  }
+
+  async dashboardCounts(): Promise<{
+    readonly total: number;
+    readonly active: number;
+    readonly invited: number;
+    readonly suspended: number;
+  }> {
+    const [total, active, invited, suspended] = await Promise.all([
+      this.users.countDocuments({}).exec(),
+      this.users.countDocuments({ status: 'ACTIVE' }).exec(),
+      this.users.countDocuments({ status: 'INVITED' }).exec(),
+      this.users.countDocuments({ status: 'SUSPENDED' }).exec(),
+    ]);
+    return { total, active, invited, suspended };
+  }
+
   async getAuthenticationState(
     userId: Types.ObjectId,
     session?: ClientSession,
@@ -164,7 +223,11 @@ export class UsersService {
       .lean()
       .exec();
     if (!updated) {
-      throw this.exception('USER_NOT_FOUND', HttpStatus.NOT_FOUND, 'The user does not exist.');
+      throw this.exception(
+        'USER_NOT_FOUND',
+        HttpStatus.NOT_FOUND,
+        'The user does not exist.',
+      );
     }
     return updated.authVersion;
   }

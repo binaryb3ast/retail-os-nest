@@ -109,14 +109,18 @@ export function validateRegistryDefaults(): void {
       (!definition.scopes.includes('SYSTEM') ||
         !definition.scopes.includes('BRANCH'))
     ) {
-      throw new Error(`System fallback requires SYSTEM and BRANCH scopes: ${key}`);
+      throw new Error(
+        `System fallback requires SYSTEM and BRANCH scopes: ${key}`,
+      );
     }
     if (
       definition.branchOverride &&
       (!definition.scopes.includes('BRANCH') ||
         !definition.scopes.includes('SYSTEM'))
     ) {
-      throw new Error(`Branch override requires SYSTEM and BRANCH scopes: ${key}`);
+      throw new Error(
+        `Branch override requires SYSTEM and BRANCH scopes: ${key}`,
+      );
     }
   }
 }

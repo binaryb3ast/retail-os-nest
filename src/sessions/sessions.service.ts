@@ -56,7 +56,10 @@ export class SessionsService implements OnModuleInit {
     const expiresAt = new Date(Date.now() + sessionLifetimeMs);
     const sessionId = new Types.ObjectId();
 
-    const currentUser = await this.users.getAuthenticationState(user.id, session);
+    const currentUser = await this.users.getAuthenticationState(
+      user.id,
+      session,
+    );
     if (
       !currentUser ||
       currentUser.status !== 'ACTIVE' ||
@@ -65,15 +68,17 @@ export class SessionsService implements OnModuleInit {
       throw this.authenticationFailed();
     }
     await this.sessions.create(
-      [{
-        _id: sessionId,
-        userId: user.id,
-        tokenHash,
-        authVersion: user.authVersion,
-        expiresAt,
-        revokedAt: null,
-        revocationReason: null,
-      }],
+      [
+        {
+          _id: sessionId,
+          userId: user.id,
+          tokenHash,
+          authVersion: user.authVersion,
+          expiresAt,
+          revokedAt: null,
+          revocationReason: null,
+        },
+      ],
       { session },
     );
     await this.audit.record(
